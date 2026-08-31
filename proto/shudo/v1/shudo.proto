@@ -1,0 +1,107 @@
+syntax = "proto3";
+
+package shudo.v1;
+
+option go_package = "shudo.local/shudo/gen/shudov1;shudov1";
+
+// LocalBroker is exposed only on /run/shudo/shudo.sock. Linux SO_PEERCRED
+// authenticates every caller. Submit/watch/cancel authorize the originating
+// local UID. List/inspect/approve/deny require the peer's current UID to be 0.
+service LocalBroker {
+  rpc Submit(SubmitRequest) returns (SubmitResponse);
+  rpc Watch(WatchRequest) returns (stream LocalEvent);
+  rpc Cancel(CancelRequest) returns (CancelResponse);
+
+  rpc ListRequests(ListRequestsRequest) returns (ListRequestsResponse);
+  rpc InspectRequest(InspectRequestRequest) returns (RequestRecord);
+  rpc Approve(DecisionRequest) returns (DecisionResponse);
+  rpc Deny(DecisionRequest) returns (DecisionResponse);
+}
+
+message SubmitRequest {
+  string executable = 1;
+  repeated string argv = 2;
+  string cwd = 3;
+  map<string, string> env = 4;
+  string reason = 5;
+  int64 timeout_ms = 6;
+}
+
+message SubmitResponse {
+  string request_id = 1;
+  string request_hash = 2;
+  string status = 3;
+  string hostname = 4;
+  string command = 5;
+}
+
+message WatchRequest {
+  string request_id = 1;
+  uint64 after_sequence = 2;
+}
+
+message LocalEvent {
+  string type = 1;
+  string request_id = 2;
+  string status = 3;
+  string stream = 4;
+  bytes data = 5;
+  string approved_by = 6;
+  string decision = 7;
+  int32 exit_code = 8;
+  bool has_exit_code = 9;
+  string signal = 10;
+  bool truncated = 11;
+  uint64 sequence = 12;
+}
+
+message CancelRequest { string request_id = 1; }
+message CancelResponse { string status = 1; }
+
+message ListRequestsRequest { bool include_history = 1; }
+message ListRequestsResponse { repeated RequestRecord requests = 1; }
+message InspectRequestRequest { string request_id = 1; }
+
+message DecisionRequest {
+  string request_id = 1;
+  string reason = 2;
+  // Approvals must echo the exact hash shown during inspection. Denials do not
+  // require it because they cannot authorize execution.
+  string request_hash = 3;
+}
+
+message DecisionResponse {
+  string request_id = 1;
+  string approval_id = 2;
+  string status = 3;
+  string decided_by = 4;
+}
+
+message RequestRecord {
+  string request_id = 1;
+  string request_hash = 2;
+  string status = 3;
+  uint32 requester_uid = 4;
+  uint32 requester_gid = 5;
+  string requester_username = 6;
+  string requester_group = 7;
+  string executable = 8;
+  repeated string argv = 9;
+  string cwd = 10;
+  map<string, string> env = 11;
+  string command = 12;
+  string reason = 13;
+  string created_at = 14;
+  string expires_at = 15;
+  string policy_result = 16;
+  bool shell = 17;
+  bool interpreter = 18;
+  bool script = 19;
+  repeated string warnings = 20;
+  string decided_by = 21;
+  string decision_reason = 22;
+  // These fields expose the authoritative, append-only decision so clients can
+  // reconcile a lost DecisionResponse without submitting another decision.
+  string decision = 23;
+  string approval_id = 24;
+}

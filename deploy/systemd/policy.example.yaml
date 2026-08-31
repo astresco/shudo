@@ -1,0 +1,37 @@
+version: 1
+defaults:
+  action: require-approval
+rules:
+  - match:
+      executable: /usr/bin/passwd
+    action: deny
+  - match:
+      path: /etc/shudo
+    action: deny
+  - match:
+      path: /etc/shudo/**
+    action: deny
+  - match:
+      path: /var/lib/shudo
+    action: deny
+  - match:
+      path: /var/lib/shudo/**
+    action: deny
+  - match:
+      path: /run/shudo
+    action: deny
+  - match:
+      path: /run/shudo/**
+    action: deny
+  - match:
+      path: /usr/local/bin/shudo
+    action: deny
+  - match:
+      path: /usr/local/sbin/shudod
+    action: deny
+  - match:
+      path: /etc/systemd/system/shudod.service
+    action: deny
+  - match:
+      path: /etc/tmpfiles.d/shudo.conf
+    action: deny

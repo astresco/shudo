@@ -1,0 +1,23 @@
+version: 1
+socketPath: /run/shudo/shudo.sock
+socketGid: @SHUDO_SOCKET_GID@
+databasePath: /var/lib/shudo/shudo.db
+policyPath: /etc/shudo/policy.yaml
+requirePeerCredentials: true
+allowNonRoot: false
+allowedEnvironment: []
+maxPendingPerUid: 8
+maxPendingTotal: 256
+maxConcurrentSubmissionsPerUid: 2
+maxConcurrentSubmissionsTotal: 32
+maxSubmissionsPerMinute: 60
+maxWatchersPerUid: 8
+maxWatchersPerRequest: 4
+maxExecutableBytes: 268435456
+maxDatabaseBytes: 1073741824
+retentionDays: 30
+maxRetainedUnapproved: 10000
+maxExecutionSeconds: 3600
+output:
+  liveBytes: 1048576
+  persistedBytes: 10485760

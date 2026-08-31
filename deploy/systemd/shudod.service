@@ -1,0 +1,29 @@
+[Unit]
+Description=Shudo local privileged request daemon
+Documentation=file:/usr/share/doc/shudo/security.md
+After=local-fs.target
+
+[Service]
+Type=simple
+ExecStartPre=/usr/bin/chown root:shudo /run/shudo
+ExecStartPre=/usr/bin/chmod 0750 /run/shudo
+ExecStart=/usr/local/sbin/shudod --config /etc/shudo/config.yaml
+User=root
+Group=root
+Restart=on-failure
+RestartSec=3s
+KillMode=control-group
+TimeoutStopSec=5s
+UMask=0077
+RuntimeDirectory=shudo
+RuntimeDirectoryMode=0750
+StateDirectory=shudo
+StateDirectoryMode=0700
+NoNewPrivileges=yes
+LimitCORE=0
+LimitNOFILE=4096
+LockPersonality=yes
+RestrictRealtime=yes
+
+[Install]
+WantedBy=multi-user.target

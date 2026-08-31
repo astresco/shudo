@@ -1,0 +1,9 @@
+/build/
+coverage/
+coverage.out
+*.coverprofile
+.env
+*.db
+*.db-shm
+*.db-wal
+.tools/
